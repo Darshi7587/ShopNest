@@ -12,7 +12,9 @@ const getProducts = async (req, res) => {
 
 const getProductById = async (req, res) => {
     try {
+        console.log("getProductById called with id:", req.params.id);
         const product = await Product.findById(req.params.id);
+        console.log("Product found:", product);
         if (product) {
             res.json(product);
         }
@@ -20,6 +22,7 @@ const getProductById = async (req, res) => {
             res.status(404).json({ message: "Product not found" });
         }
     } catch (error) {
+        console.error("getProductById error:", error.message);
         res.status(500).json({ message: "Server error" });
     }   
 };
@@ -61,6 +64,8 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { name, description, price, category, stock } = req.body;
+        console.log("updateProduct called with id:", req.params.id);
+        console.log("updateProduct body:", { name, description, price, category, stock });
         const product = await Product.findById(req.params.id);
         if (product) {
             product.name = name || product.name;
@@ -69,18 +74,23 @@ const updateProduct = async (req, res) => {
             product.category = category || product.category;
             product.stock = stock || product.stock;
             if(req.file){
-                const result = await cloudinary.uploader.upload(req.file.path);
-                console.log(result);
-                product.imageUrl = result.secure_url;
+                try {
+                    const result = await cloudinary.uploader.upload(req.file.path);
+                    console.log(result);
+                    product.imageUrl = result.secure_url;
+                } catch (cloudinaryError) {
+                    console.warn("Cloudinary upload failed:", cloudinaryError.message);
+                }
             }
-                const updatedProduct = await product.save();
-                res.json(updatedProduct);
+            const updatedProduct = await product.save();
+            res.json(updatedProduct);
         } else {
             res.status(404).json({ message: "Product not found" });
         }
-    }
-    catch (error) { 
-        res.status(500).json({ message: "Server error" });
+    } catch (error) { 
+        console.error("updateProduct error:", error.message);
+        console.error("Full error:", error);
+        res.status(500).json({ message: error.message || "Server error" });
     }
 };
 
