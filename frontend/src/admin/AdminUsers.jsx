@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 
 const AdminUsers = () => {
   const { user } = useContext(AuthContext);
@@ -7,7 +8,7 @@ const AdminUsers = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await fetch('/api/auth/users', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/users`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       const data = await res.json();
@@ -38,7 +39,7 @@ const AdminUsers = () => {
                 <td style={tdStyle}>{u.email}</td>
                 <td style={tdStyle}>
                   <span style={{ background: u.role === 'admin' ? 'rgba(234,88,12,0.2)' : 'rgba(16,185,129,0.2)', color: u.role === 'admin' ? '#f97316' : '#10b981', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                    {u.role.toUpperCase()}
+                    {(u.role || 'user').toUpperCase()}
                   </span>
                 </td>
                 <td style={tdStyle}>{new Date(u.createdAt).toLocaleDateString()}</td>

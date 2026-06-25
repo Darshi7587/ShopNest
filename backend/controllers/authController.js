@@ -62,7 +62,12 @@ This OTP will expire in 10 minutes.
             success: true,
             message: "OTP sent successfully",
             token: generateToken(user._id),
-            userId: user._id
+            userId: user._id,
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            verified: user.verified
         });
 
     } catch (error) {
@@ -88,6 +93,7 @@ const loginUser = async (req, res) => {
                 name:user.name,
                 email:user.email,
                 role:user.role, 
+                verified: user.verified,
                 token:generateToken(user._id)
             });
         }else{
